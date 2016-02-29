@@ -5,8 +5,9 @@ public class CasterCam : MonoBehaviour
 {
     public Texture2D crosshairTex;
     private Rect crhPosition;
-
-    float xChange;
+    private float csTextH;
+    private float csTextW;
+    private float sizeAdjuster = .10f;
     bool rShoulder;
 
     void Start()
@@ -16,18 +17,45 @@ public class CasterCam : MonoBehaviour
 
     void Update()
     {
-        //RayCasting();
         CrosshairPosition();
     }
 
     void LateUpdate()
     {
-        //CamLogic();
+        CamLogic();
     }
 
     void OnGUI()
     {
         GUI.DrawTexture(crhPosition, crosshairTex);
+    }
+
+    void CrosshairPosition()
+    {
+        csTextH = crosshairTex.height * sizeAdjuster;
+        csTextW = crosshairTex.width * sizeAdjuster;
+        crhPosition = new Rect((Screen.width - csTextW) / 2,
+           (Screen.height - csTextH) / 2, csTextW, csTextH); //determines width/height of our crosshair GUI texture
+    }
+
+    void CamLogic()
+    {
+        //Toggles cam location between left and right over the shoulder.
+        if (Input.GetKeyDown(KeyCode.V))
+        {
+            if (rShoulder == true)
+            {
+                Debug.Log("Camera is over your left shoulder");
+                transform.localPosition = new Vector3(-1, 0, -4);
+                rShoulder = false;
+            }
+            else
+            {
+                Debug.Log("Camera is over your right shoulder");
+                transform.localPosition = new Vector3(1, 0, -4);
+                rShoulder = true;
+            }
+        }
     }
 
     void RayCasting()
@@ -45,36 +73,6 @@ public class CasterCam : MonoBehaviour
             Debug.Log(hitPoint);
         }
     }
-    void CrosshairPosition()
-    {
-        crhPosition = new Rect((Screen.width - crosshairTex.width) / 2,
-           (Screen.height - crosshairTex.height) / 2,
-            crosshairTex.width, crosshairTex.height); //determines width/height of our crosshair GUI texture
-    }
-
-    void CamLogic()
-    {
-        //Toggles cam location between left and right over the shoulder.
-        if (Input.GetKeyDown(KeyCode.V))
-        {
-            if (rShoulder == true)
-            {
-                xChange = -2;
-                rShoulder = false;
-                Debug.Log(rShoulder);
-                Debug.Log(xChange);
-            }
-            else
-            {
-                xChange = 2;
-                rShoulder = true;
-                Debug.Log(rShoulder);
-                Debug.Log(xChange);
-            }
-        }
-    }
-
-
 }
 
 

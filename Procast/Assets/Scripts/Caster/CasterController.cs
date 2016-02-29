@@ -3,10 +3,25 @@ using System.Collections;
 
 public class CasterController : MonoBehaviour {
 
+    protected enum CasterState
+    {
+        Idle = 0,
+        CrouchingIdle = 1,
+        CrouchWalking = 2,
+        Walking = 3,
+        Sprinting = 4,
+        Falling = 5, 
+        Attacking = 6, 
+        Dead = 7
+    }
+
+    #region Variables
+    CasterState currentState;
     CharacterController myCaster;
     private Animator anim;
     public Camera casterCam;
     public GameObject casterHead;
+
     GameObject fireball;
     GameObject firewall;
 
@@ -23,13 +38,14 @@ public class CasterController : MonoBehaviour {
 
 
     //Stats
-    protected float health;
+    public float health;
     protected float mana;
-    protected float moveSpeed = 5.0f;
-    protected float sprintSpeed = 2.0f;
-    protected float rotSpeed = 1.0f;
+    protected float moveSpeed = 3f;
+    protected float sprintSpeed = 5.5f;
+    protected float rotSpeed = 700.0f;
     protected float vertLookSpeed = 1.0f;
     protected float detectRange;
+    Quaternion targetRotation;
 
     //protected Affinity affinity; 
 
@@ -57,13 +73,17 @@ public class CasterController : MonoBehaviour {
 
     public float gravity = 20.0F;
     private Vector3 moveDirection = Vector3.zero;
+    #endregion
 
     void Start()
     {
         anim = GetComponent<Animator>();
         myCaster = GetComponent<CharacterController>();
+        currentState = CasterState.Idle;
+        targetRotation = transform.rotation;
         fireball = Resources.Load("Fireball") as GameObject;
         firewall = Resources.Load("Firewall") as GameObject;
+        health = 100;
         fireballReady = true;
         firewallReady = true;
         afterburnerReady = true;
@@ -73,8 +93,10 @@ public class CasterController : MonoBehaviour {
     void Update()
     {
         RayCasting();
-        MovementHandler();
+        //MovementHandler();
         SkillHandler();
+        CharStateManager();
+        AnimationManager();
     }
 
     void RayCasting()
@@ -105,7 +127,7 @@ public class CasterController : MonoBehaviour {
         //FireballSkill (Mouse1)
         if (Input.GetMouseButtonDown(0) && fireballReady == true)
         {
-            anim.Play("Standing_Walk_Forward", -1, 0f);
+            anim.Play("Attacking");
             GameObject myFireball = Instantiate(fireball) as GameObject;
             myFireball.transform.position = casterCam.transform.position + casterCam.transform.forward * 10f;
             //myFireball.transform.position = casterHead.transform.position + casterHead.transform.forward * myFireball.transform.localScale.y;
@@ -148,6 +170,7 @@ public class CasterController : MonoBehaviour {
 
     void MovementHandler()
     {
+        anim.SetFloat("speed", moveSpeed);
         //align with camera
         //code here...
 
@@ -158,18 +181,11 @@ public class CasterController : MonoBehaviour {
             anim.SetFloat("vInput", vAxis);
             anim.SetFloat("hInput", hAxis);
 
-            //Idle
-            if (hAxis == 0 && vAxis == 0)
-            {
-                anim.SetBool("Idle", true);
-            }
-            else
-                anim.SetBool("Idle", false);
-
             //forward, backward, strafing movement
             moveDirection = new Vector3(hAxis, 0, vAxis);
             moveDirection = transform.TransformDirection(moveDirection);
             moveDirection *= moveSpeed;
+
 
             //Sprinting
             if (Input.GetKey(KeyCode.LeftShift))
@@ -180,15 +196,162 @@ public class CasterController : MonoBehaviour {
             else
                 anim.SetBool("isSprinting", false);
         }
-        //turning with mouse
-        float h = rotSpeed * Input.GetAxis("Mouse X");
-        transform.Rotate(0, h, 0);
-
-
 
         //gravity
-        moveDirection.y -= gravity * Time.deltaTime;
+        //moveDirection.y -= gravity * Time.deltaTime;
         //needs this to work
+        //myCaster.Move(moveDirection * Time.deltaTime);
+    }
+
+    void CharStateManager()
+    {
+        //Axis Input
+        float h = Input.GetAxis("Horizontal");
+        float v = Input.GetAxis("Vertical");
+        anim.SetFloat("vInput", v);
+        anim.SetFloat("hInput", h);
+        
+        //gravity
+        moveDirection.y -= gravity * Time.deltaTime;
         myCaster.Move(moveDirection * Time.deltaTime);
+
+        //turning with mouse
+        targetRotation *= Quaternion.AngleAxis(rotSpeed * Input.GetAxis("Mouse X") * Time.deltaTime, Vector3.up);
+        transform.rotation = targetRotation;
+
+        //State Logic
+        #region Movement
+        if (health <= 0)
+        {
+            currentState = CasterState.Dead;            
+        }
+        if (health > 0)
+        {
+            if (myCaster.isGrounded)
+            {
+                //to Idle
+                if (h == 0 && v == 0)
+                {
+                    currentState = CasterState.Idle;
+                    if (currentState == CasterState.Idle) //if Idle
+                    {
+                        //to Crouch Idle
+                        if (Input.GetKey(KeyCode.C))
+                        {
+                            currentState = CasterState.CrouchingIdle;
+                        }
+                    }
+                }
+                //to Walk
+                else if (Mathf.Abs(h) > 0 || Mathf.Abs(v) > 0)
+                {
+                    moveDirection = new Vector3(h, 0, v);
+                    moveDirection = transform.TransformDirection(moveDirection);
+                    moveDirection *= moveSpeed;
+                    currentState = CasterState.Walking;
+
+                    //If Walking
+                    if (currentState == CasterState.Walking)
+                    {
+                        //to Sprint
+                        if (Input.GetKey(KeyCode.LeftShift))
+                        {
+                            moveDirection = new Vector3(h, 0, v);
+                            moveDirection = transform.TransformDirection(moveDirection);
+                            moveDirection *= sprintSpeed;
+                            currentState = CasterState.Sprinting;
+                        }
+                        else if (Input.GetKey(KeyCode.C))
+                        {
+                            currentState = CasterState.CrouchWalking;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                currentState = CasterState.Falling;
+            }
+        }
+        #endregion
+    }  
+
+    void AnimationManager()
+    {
+        if (currentState == CasterState.Idle)
+        {
+            anim.Play("Idle");
+            Debug.Log("Idle");
+            /*anim.SetBool("isIdle", true);
+            anim.SetBool("isCrouchingIdle", false);
+            anim.SetBool("isCrouchWalking", false);
+            anim.SetBool("isWalking", false);
+            anim.SetBool("isSprinting", false);
+            */
+        }
+        if (currentState == CasterState.CrouchingIdle)
+        {
+            anim.Play("CrouchingIdle");
+            Debug.Log("CrouchingIdle");
+            /*
+            anim.SetBool("isCrouchingIdle", true);
+            anim.SetBool("isIdle", false);
+            anim.SetBool("isCrouchWalking", false);
+            anim.SetBool("isWalking", false);
+            anim.SetBool("isSprinting", false);
+            */
+        }
+        if (currentState == CasterState.CrouchWalking)
+        {
+            anim.Play("CrouchWalking");
+            Debug.Log("CrouchWalking");
+            /*
+            anim.SetBool("isCrouchWalking", true);
+            anim.SetBool("isIdle", false);
+            anim.SetBool("isCrouchingIdle", false);
+            anim.SetBool("isWalking", false);
+            anim.SetBool("isSprinting", false);
+            */
+        }
+        if (currentState == CasterState.Walking)
+        {
+            anim.Play("Walking");
+            Debug.Log("Walking");
+            /*
+            anim.SetBool("isWalking", true);
+            anim.SetBool("isCrouchWalking", false);
+            anim.SetBool("isIdle", false);
+            anim.SetBool("isCrouchingIdle", false);
+            anim.SetBool("isSprinting", false);
+            */
+        }
+        if (currentState == CasterState.Sprinting)
+        {
+            anim.Play("Sprinting");
+            Debug.Log("Sprinting");
+            /*
+            anim.SetBool("isSprinting", true);
+            anim.SetBool("isWalking", false);
+            anim.SetBool("isCrouchWalking", false);
+            anim.SetBool("isIdle", false);
+            anim.SetBool("isCrouchingIdle", false);
+            */
+        }
+        if(currentState == CasterState.Falling)
+        {
+            anim.Play("Falling");
+            Debug.Log("Falling");
+        }
+        if(currentState == CasterState.Attacking)
+        {
+            anim.Play("Attacking");
+            Debug.Log("Attacking");
+        }
+        if (currentState == CasterState.Dead)
+        {
+            anim.Play("Dead");
+            Debug.Log("You're Dead");
+            //anim.SetBool("isDead", true);
+        }
     }
 }
