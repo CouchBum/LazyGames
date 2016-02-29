@@ -14,7 +14,7 @@ GameObject:
   - 114: {fileID: 11435722}
   - 143: {fileID: 14340088}
   m_Layer: 0
-  m_Name: ForceCaster
+  m_Name: ForceCasterv1
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -4,7 +4,7 @@ using System.Collections;
 public class CasterController : MonoBehaviour {
 
     CharacterController myCaster;
-    public Animator anim;
+    private Animator anim;
     public Camera casterCam;
     public GameObject casterHead;
     GameObject fireball;
@@ -18,7 +18,7 @@ public class CasterController : MonoBehaviour {
     //Game
     protected float team;
     protected Vector3 currentPosition;
-    
+
     //State
 
 
@@ -116,14 +116,14 @@ public class CasterController : MonoBehaviour {
             //fireballReady = false;
             Debug.Log("Fireball On Cooldown");
 
-            if(fireballReady == false)
+            if (fireballReady == false)
             {
 
             }
         }
 
         //FireWall (Mouse2)
-        if(Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonDown(1))
         {
             GameObject myFirewall = Instantiate(firewall) as GameObject;
             myFirewall.transform.position = myCaster.transform.position + casterCam.transform.forward * 10f;
@@ -133,14 +133,14 @@ public class CasterController : MonoBehaviour {
 
         //FlareBoosters (Space)
         float ascendSpeed = 10f;
-        if(Input.GetKey(KeyCode.Space))
+        if (Input.GetKey(KeyCode.Space))
         {
             moveDirection = new Vector3(0, ascendSpeed, 0);
             moveDirection = transform.TransformDirection(moveDirection);
         }
 
         //Afterburner (F)
-        if(Input.GetKeyDown(KeyCode.F))
+        if (Input.GetKeyDown(KeyCode.F))
         {
 
         }
@@ -150,23 +150,41 @@ public class CasterController : MonoBehaviour {
     {
         //align with camera
         //code here...
-        
+
         if (myCaster.isGrounded)
         {
+            float hAxis = Input.GetAxis("Horizontal");
+            float vAxis = Input.GetAxis("Vertical");
+            anim.SetFloat("vInput", vAxis);
+            anim.SetFloat("hInput", hAxis);
+
+            //Idle
+            if (hAxis == 0 && vAxis == 0)
+            {
+                anim.SetBool("Idle", true);
+            }
+            else
+                anim.SetBool("Idle", false);
+
             //forward, backward, strafing movement
-            moveDirection = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+            moveDirection = new Vector3(hAxis, 0, vAxis);
             moveDirection = transform.TransformDirection(moveDirection);
             moveDirection *= moveSpeed;
 
             //Sprinting
-            if(Input.GetKey(KeyCode.LeftShift))
+            if (Input.GetKey(KeyCode.LeftShift))
             {
                 moveDirection *= sprintSpeed;
+                anim.SetBool("isSprinting", true);
             }
+            else
+                anim.SetBool("isSprinting", false);
         }
         //turning with mouse
         float h = rotSpeed * Input.GetAxis("Mouse X");
         transform.Rotate(0, h, 0);
+
+
 
         //gravity
         moveDirection.y -= gravity * Time.deltaTime;
