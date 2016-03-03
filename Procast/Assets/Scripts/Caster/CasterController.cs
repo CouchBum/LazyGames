@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class CasterController : MonoBehaviour {
@@ -44,6 +45,9 @@ public class CasterController : MonoBehaviour {
     bool crouchWalking;
     bool dead;
 
+    //UI Elements
+    public Text healthText;
+
     //Stats
     public int health;
     protected float mana;
@@ -86,40 +90,30 @@ public class CasterController : MonoBehaviour {
     {
         myCaster = GetComponent<CharacterController>();
         anim = GetComponent<Animator>();
+        currentState = CasterState.Idle;
         health = 100;
+        SetHealthText();        
         targetRotation = transform.rotation;
         fireball = Resources.Load("Fireball") as GameObject;
         firewall = Resources.Load("Firewall") as GameObject;
         fireballReady = true;
-
-        //Rename Animator Bools to make life easier
-        idle = anim.GetBool("isIdle");
-        walking = anim.GetBool("isWalking");
-        sprinting = anim.GetBool("isSprinting");
-        turning = anim.GetBool("isTurning");
-        crouchingIdle = anim.GetBool("isCrouchingIdle");
-        crouchWalking = anim.GetBool("isCrouchWalking");
-        dead = anim.GetBool("isDead");
-        
-        
-        currentState = CasterState.Idle;
-        /*
         firewallReady = true;
         afterburnerReady = true;
         flareboostersReady = true;
-        */
     }
 
     void Update()
     {
         RayCasting();
         HealthManager();       
-        //MovementHandler();
         SkillHandler();
-        CharStateManager();
         AnimationManager();
     }
 
+    void FixedUpdate()
+    {
+        CharStateManager();
+    }
 
     void HealthManager()
     {
@@ -131,12 +125,17 @@ public class CasterController : MonoBehaviour {
             anim.SetBool("isDead", true);
             Destroy(thisCaster, 5f);
         }
-        
+
         if (Input.GetKeyDown(KeyCode.K)) //hit by attack
         {
             health -= 50; //attack damage
+            SetHealthText();
         }
-        
+    }
+
+    void SetHealthText()
+    {
+        healthText.text = "Health: " + health.ToString();
     }
 
     void RayCasting()
@@ -167,7 +166,7 @@ public class CasterController : MonoBehaviour {
         //FireballSkill (Mouse1)
         if (Input.GetMouseButtonDown(0) && fireballReady == true)
         {
-            anim.Play("FireBall");
+            anim.SetTrigger("fireball");
             //anim.SetBool("isFireball", true);
             GameObject myFireball = Instantiate(fireball) as GameObject;
             myFireball.transform.position = casterCam.transform.position + casterCam.transform.forward * 10f;
@@ -208,41 +207,6 @@ public class CasterController : MonoBehaviour {
         }
     }
 
-    void MovementHandler()
-    {
-        anim.SetFloat("speed", moveSpeed);
-        //align with camera
-        //code here...
-
-        if (myCaster.isGrounded)
-        {
-            float hAxis = Input.GetAxis("Horizontal");
-            float vAxis = Input.GetAxis("Vertical");
-            anim.SetFloat("vInput", vAxis);
-            anim.SetFloat("hInput", hAxis);
-
-            //forward, backward, strafing movement
-            moveDirection = new Vector3(hAxis, 0, vAxis);
-            moveDirection = transform.TransformDirection(moveDirection);
-            moveDirection *= moveSpeed;
-
-
-            //Sprinting
-            if (Input.GetKey(KeyCode.LeftShift))
-            {
-                moveDirection *= sprintSpeed;
-                anim.SetBool("isSprinting", true);
-            }
-            else
-                anim.SetBool("isSprinting", false);
-        }
-
-        //gravity
-        //moveDirection.y -= gravity * Time.deltaTime;
-        //needs this to work
-        //myCaster.Move(moveDirection * Time.deltaTime);
-    }
-
     void CharStateManager()
     {
         //Axis Input
@@ -273,7 +237,7 @@ public class CasterController : MonoBehaviour {
                 if (currentState == CasterState.Idle) 
                 {
                     //to Crouch Idle
-                    if (Input.GetKey(KeyCode.C))
+                    if (Input.GetKey(KeyCode.LeftControl))
                     {
                         currentState = CasterState.CrouchingIdle;
                     }
@@ -297,8 +261,10 @@ public class CasterController : MonoBehaviour {
                         moveDirection = transform.TransformDirection(moveDirection);
                         moveDirection *= sprintSpeed;
                         currentState = CasterState.Sprinting;
+                        if (Input.GetKeyUp(KeyCode.LeftShift))
+                            currentState = CasterState.Walking;
                     }
-                    else if (Input.GetKey(KeyCode.C))
+                    else if (Input.GetKey(KeyCode.LeftControl))
                     {
                         currentState = CasterState.CrouchWalking;
                     }
@@ -307,7 +273,7 @@ public class CasterController : MonoBehaviour {
         }
         else
         {
-            currentState = CasterState.Falling;
+            //currentState = CasterState.Falling;
         }
         #endregion
     }  
@@ -317,17 +283,20 @@ public class CasterController : MonoBehaviour {
         if (currentState == CasterState.Idle)
         {
             //anim.Play("Idle");
-            Debug.Log("Idle");
-            anim.SetBool("isIdle", true);
-            anim.SetBool("isCrouchingIdle", false);
-            anim.SetBool("isCrouchWalking", false);
-            anim.SetBool("isWalking", false);
-            anim.SetBool("isSprinting", false);
+            if (anim.GetBool("isIdle") == false)
+            {
+                anim.SetBool("isIdle", true);
+                anim.SetBool("isCrouchingIdle", false);
+                anim.SetBool("isCrouchWalking", false);
+                anim.SetBool("isWalking", false);
+                anim.SetBool("isSprinting", false);
+            }
+            else
+            { }
         }
         if (currentState == CasterState.CrouchingIdle)
         {
             //anim.Play("CrouchingIdle");
-            Debug.Log("CrouchingIdle");
             anim.SetBool("isCrouchingIdle", true);
             anim.SetBool("isIdle", false);
             anim.SetBool("isCrouchWalking", false);
@@ -337,7 +306,6 @@ public class CasterController : MonoBehaviour {
         if (currentState == CasterState.CrouchWalking)
         {
             //anim.Play("CrouchWalking");
-            Debug.Log("CrouchWalking");
             anim.SetBool("isCrouchWalking", true);
             anim.SetBool("isIdle", false);
             anim.SetBool("isCrouchingIdle", false);
@@ -347,17 +315,18 @@ public class CasterController : MonoBehaviour {
         if (currentState == CasterState.Walking)
         {
             //anim.Play("Walking");
-            Debug.Log("Walking");
-            anim.SetBool("isWalking", true);
-            anim.SetBool("isCrouchWalking", false);
-            anim.SetBool("isIdle", false);
-            anim.SetBool("isCrouchingIdle", false);
-            anim.SetBool("isSprinting", false);
+            if (walking == false)
+            {
+                anim.SetBool("isWalking", true);
+                anim.SetBool("isCrouchWalking", false);
+                anim.SetBool("isIdle", false);
+                anim.SetBool("isCrouchingIdle", false);
+                anim.SetBool("isSprinting", false);
+            }
         }
         if (currentState == CasterState.Sprinting)
         {
             //anim.Play("Sprinting");
-            Debug.Log("Sprinting");
             anim.SetBool("isSprinting", true);
             anim.SetBool("isWalking", false);
             anim.SetBool("isCrouchWalking", false);
@@ -367,7 +336,7 @@ public class CasterController : MonoBehaviour {
         if(currentState == CasterState.Falling)
         {
             //anim.Play("Falling");
-            Debug.Log("Falling");
+            anim.SetBool("isFalling", true);
             anim.SetBool("isIdle", false);
             anim.SetBool("isWalking", false);
             anim.SetBool("isCrouchWalking", false);
@@ -379,12 +348,10 @@ public class CasterController : MonoBehaviour {
         if (currentState == CasterState.Attacking)
         {
             //anim.Play("Attacking");
-            Debug.Log("Attacking");
         }
         if (currentState == CasterState.Dead)
         {
             //anim.Play("Dead");
-            Debug.Log("You're Dead");
             anim.SetBool("isDead", true);
             anim.SetBool("isWalking", false);
             anim.SetBool("isCrouchWalking", false);

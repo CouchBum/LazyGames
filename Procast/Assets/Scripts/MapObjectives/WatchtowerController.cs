@@ -11,14 +11,10 @@ public class WatchtowerController : MonoBehaviour {
     {
 
     }
-	
-	void Update ()
-    {
-        CheckForCasters();
-	}
 
-    void CheckForCasters()
-    { 
-    
+    void OnTriggerStay()
+    {
+        beingCaptured = true;
+        Debug.Log("Watchtower Being Captured");
     }
 }
