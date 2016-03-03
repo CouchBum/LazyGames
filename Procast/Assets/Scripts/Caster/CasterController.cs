@@ -81,6 +81,9 @@ public class CasterController : MonoBehaviour {
     protected float damageTaken;
     //protected float et.....
 
+    public bool crouchToggle;
+    public bool sprintToggle;
+
 
     public float gravity = 20.0F;
     private Vector3 moveDirection = Vector3.zero;
@@ -96,6 +99,8 @@ public class CasterController : MonoBehaviour {
         targetRotation = transform.rotation;
         fireball = Resources.Load("Fireball") as GameObject;
         firewall = Resources.Load("Firewall") as GameObject;
+        crouchToggle = false;
+        sprintToggle = false;
         fireballReady = true;
         firewallReady = true;
         afterburnerReady = true;
@@ -107,19 +112,14 @@ public class CasterController : MonoBehaviour {
         RayCasting();
         HealthManager();       
         SkillHandler();
-        AnimationManager();
-    }
-
-    void FixedUpdate()
-    {
-        CharStateManager();
+        CurrentStateCalculator();
     }
 
     void HealthManager()
     {
         //anim.SetInteger("health", health);
         if (health > 0)
-                anim.SetBool("isDead", false);
+            anim.SetBool("isDead", false);
         else
         {
             anim.SetBool("isDead", true);
@@ -207,11 +207,12 @@ public class CasterController : MonoBehaviour {
         }
     }
 
-    void CharStateManager()
+    void CurrentStateCalculator()
     {
         //Axis Input
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
+        float mouseX = Input.GetAxis("Mouse X");
         anim.SetFloat("vInput", v);
         anim.SetFloat("hInput", h);
         
@@ -220,144 +221,140 @@ public class CasterController : MonoBehaviour {
         myCaster.Move(moveDirection * Time.deltaTime);
 
         //turning with mouse
-        targetRotation *= Quaternion.AngleAxis(rotSpeed * Input.GetAxis("Mouse X") * Time.deltaTime, Vector3.up);
+        targetRotation *= Quaternion.AngleAxis(rotSpeed * mouseX * Time.deltaTime, Vector3.up);
         transform.rotation = targetRotation;
 
-        //State Logic
-        #region Movement
         if (myCaster.isGrounded)
         {
-            //to Idle
-            if (h == 0 && v == 0)
+            if (Input.GetButtonDown("Crouch"))
+                CrouchToggle();
+
+            //To Idle & Crouch Idle
+            if (v == 0 && h == 0 && crouchToggle == false)
             {
                 currentState = CasterState.Idle;
+                sprintToggle = false;
                 moveDirection = Vector3.zero;
-
-                //if Idle
-                if (currentState == CasterState.Idle) 
-                {
-                    //to Crouch Idle
-                    if (Input.GetKey(KeyCode.LeftControl))
-                    {
-                        currentState = CasterState.CrouchingIdle;
-                    }
-                }
             }
-            //to Walk
-            else if (Mathf.Abs(h) > 0 || Mathf.Abs(v) > 0)
+            else if (v == 0 && h == 0 && crouchToggle == true)
             {
-                moveDirection = new Vector3(h, 0, v);
-                moveDirection = transform.TransformDirection(moveDirection);
-                moveDirection *= moveSpeed;
-                currentState = CasterState.Walking;
+                currentState = CasterState.CrouchingIdle;
+                sprintToggle = false;
+                moveDirection = Vector3.zero;
+            }
 
-                //If Walking
-                if (currentState == CasterState.Walking)
+                //To Walk & Crouch Walk & Sprint
+                if (Mathf.Abs(h) > 0 || Mathf.Abs(v) > 0)
+            {
+                if (Input.GetButtonDown("Sprint"))
+                    SprintToggle();
+
+                if (crouchToggle == false)
                 {
-                    //to Sprint
-                    if (Input.GetKey(KeyCode.LeftShift))
-                    {
-                        moveDirection = new Vector3(h, 0, v);
-                        moveDirection = transform.TransformDirection(moveDirection);
-                        moveDirection *= sprintSpeed;
-                        currentState = CasterState.Sprinting;
-                        if (Input.GetKeyUp(KeyCode.LeftShift))
-                            currentState = CasterState.Walking;
-                    }
-                    else if (Input.GetKey(KeyCode.LeftControl))
-                    {
-                        currentState = CasterState.CrouchWalking;
-                    }
+                    moveDirection = new Vector3(h, 0, v);
+                    moveDirection = transform.TransformDirection(moveDirection);
+                    moveDirection *= moveSpeed;
+                    currentState = CasterState.Walking;
+                }
+                else if (crouchToggle == true)
+                {
+                    moveDirection = new Vector3(h, 0, v);
+                    moveDirection = transform.TransformDirection(moveDirection);
+                    moveDirection *= moveSpeed/2;
+                    currentState = CasterState.CrouchWalking;
+                }
+                if (sprintToggle == true)
+                {
+                    crouchToggle = false;
+                    moveDirection = new Vector3(h, 0, v);
+                    moveDirection = transform.TransformDirection(moveDirection);
+                    moveDirection *= sprintSpeed;
+                    currentState = CasterState.Sprinting;
                 }
             }
         }
+        AnimationManager();
+    }
+
+    void CrouchToggle()
+    {
+        if (crouchToggle == true)
+            crouchToggle = false;
         else
-        {
-            //currentState = CasterState.Falling;
-        }
-        #endregion
-    }  
+            crouchToggle = true;
+
+    }
+
+    void SprintToggle()
+    {
+        if (sprintToggle == true)
+            sprintToggle = false;
+        else
+            sprintToggle = true;
+    }
 
     void AnimationManager()
     {
-        if (currentState == CasterState.Idle)
+        switch (currentState)
         {
-            //anim.Play("Idle");
-            if (anim.GetBool("isIdle") == false)
-            {
+            case CasterState.Idle:
                 anim.SetBool("isIdle", true);
                 anim.SetBool("isCrouchingIdle", false);
                 anim.SetBool("isCrouchWalking", false);
                 anim.SetBool("isWalking", false);
                 anim.SetBool("isSprinting", false);
-            }
-            else
-            { }
-        }
-        if (currentState == CasterState.CrouchingIdle)
-        {
-            //anim.Play("CrouchingIdle");
-            anim.SetBool("isCrouchingIdle", true);
-            anim.SetBool("isIdle", false);
-            anim.SetBool("isCrouchWalking", false);
-            anim.SetBool("isWalking", false);
-            anim.SetBool("isSprinting", false);
-        }
-        if (currentState == CasterState.CrouchWalking)
-        {
-            //anim.Play("CrouchWalking");
-            anim.SetBool("isCrouchWalking", true);
-            anim.SetBool("isIdle", false);
-            anim.SetBool("isCrouchingIdle", false);
-            anim.SetBool("isWalking", false);
-            anim.SetBool("isSprinting", false);
-        }
-        if (currentState == CasterState.Walking)
-        {
-            //anim.Play("Walking");
-            if (walking == false)
-            {
+                break;
+
+            case CasterState.Walking:
                 anim.SetBool("isWalking", true);
                 anim.SetBool("isCrouchWalking", false);
                 anim.SetBool("isIdle", false);
                 anim.SetBool("isCrouchingIdle", false);
                 anim.SetBool("isSprinting", false);
-            }
-        }
-        if (currentState == CasterState.Sprinting)
-        {
-            //anim.Play("Sprinting");
-            anim.SetBool("isSprinting", true);
-            anim.SetBool("isWalking", false);
-            anim.SetBool("isCrouchWalking", false);
-            anim.SetBool("isIdle", false);
-            anim.SetBool("isCrouchingIdle", false);
-        }
-        if(currentState == CasterState.Falling)
-        {
-            //anim.Play("Falling");
-            anim.SetBool("isFalling", true);
-            anim.SetBool("isIdle", false);
-            anim.SetBool("isWalking", false);
-            anim.SetBool("isCrouchWalking", false);
-            anim.SetBool("isIdle", false);
-            anim.SetBool("isCrouchingIdle", false);
-            anim.SetBool("isSprinting", false);
+                break;
 
-        }
-        if (currentState == CasterState.Attacking)
-        {
-            //anim.Play("Attacking");
-        }
-        if (currentState == CasterState.Dead)
-        {
-            //anim.Play("Dead");
-            anim.SetBool("isDead", true);
-            anim.SetBool("isWalking", false);
-            anim.SetBool("isCrouchWalking", false);
-            anim.SetBool("isIdle", false);
-            anim.SetBool("isSprinting", false);
-            anim.SetBool("isCrouchingIdle", false);
+            case CasterState.CrouchingIdle:
+                anim.SetBool("isCrouchingIdle", true);
+                anim.SetBool("isIdle", false);
+                anim.SetBool("isCrouchWalking", false);
+                anim.SetBool("isWalking", false);
+                anim.SetBool("isSprinting", false);
+                break;
+
+            case CasterState.CrouchWalking:
+                anim.SetBool("isCrouchWalking", true);
+                anim.SetBool("isIdle", false);
+                anim.SetBool("isCrouchingIdle", false);
+                anim.SetBool("isWalking", false);
+                anim.SetBool("isSprinting", false);
+                break;
+
+            case CasterState.Sprinting:
+                anim.SetBool("isSprinting", true);
+                anim.SetBool("isWalking", false);
+                anim.SetBool("isCrouchWalking", false);
+                anim.SetBool("isIdle", false);
+                anim.SetBool("isCrouchingIdle", false);
+                break;
+
+            case CasterState.Falling:
+                anim.SetBool("isFalling", true);
+                anim.SetBool("isIdle", false);
+                anim.SetBool("isWalking", false);
+                anim.SetBool("isCrouchWalking", false);
+                anim.SetBool("isIdle", false);
+                anim.SetBool("isCrouchingIdle", false);
+                anim.SetBool("isSprinting", false);
+                break;
+
+            case CasterState.Dead:
+                anim.SetBool("isDead", true);
+                anim.SetBool("isWalking", false);
+                anim.SetBool("isCrouchWalking", false);
+                anim.SetBool("isIdle", false);
+                anim.SetBool("isSprinting", false);
+                anim.SetBool("isCrouchingIdle", false);
+                break;
         }
     }
 }
