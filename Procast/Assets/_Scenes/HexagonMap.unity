@@ -892,8 +892,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32dda292381ff95418e21a210bac11b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  thisCaster: {fileID: 446991983}
   casterCam: {fileID: 723941055}
   casterHead: {fileID: 1610475890}
+  health: 0
   gravity: 20
 --- !u!143 &446991985
 CharacterController:
