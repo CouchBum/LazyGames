@@ -265,6 +265,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3bd988f40fb1f834fa09697a4cc48909, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gmScript: {fileID: 0}
 --- !u!4 &643458122
 Transform:
   m_ObjectHideFlags: 0
@@ -498,7 +499,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 080be1e48c6b23f419de31d3b7c83d0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scene: 0
 --- !u!4 &1909511914
 Transform:
   m_ObjectHideFlags: 0

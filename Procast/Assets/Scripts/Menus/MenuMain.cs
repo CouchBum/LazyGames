@@ -4,8 +4,15 @@ using System.Collections;
 
 public class MenuMain : MonoBehaviour {
 
+    public GameManager gm;
+
+    void Awake()
+    {
+        gm = (GameManager)FindObjectOfType(typeof(GameManager));
+    }
+
     public void PlayGame()
     {
-        SceneManager.LoadScene(1); //Load CSS
+        gm.OnPlayGame();
     }
 }

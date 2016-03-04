@@ -4,8 +4,25 @@ using System.Collections;
 
 public class MenuCSS : MonoBehaviour {
 
-    public void ForceCaster()
+    public GameManager gm;
+    int CID;
+
+    void Awake()
     {
-        SceneManager.LoadScene(2); //Load Map
+        gm = (GameManager)FindObjectOfType(typeof(GameManager));
+        CID = 5;
+    }
+
+    public void Select(int x) //should be universal code here to grab any caster, not on a per-button case.
+    {
+        CID = x;
+    }
+
+    public void LockIn()
+    {
+        if (CID < 5)
+            gm.SetCID(CID);
+        else
+            Debug.Log("Choose a Caster");
     }
 }

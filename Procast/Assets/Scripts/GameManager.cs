@@ -4,7 +4,7 @@ using System.Collections;
 
 public class GameManager : MonoBehaviour {
 
-    public enum Scenes
+    public enum GameScenes
     {
         MainMenu = 0,
         CSS = 1,
@@ -12,7 +12,9 @@ public class GameManager : MonoBehaviour {
     }
 
     private static GameManager manager = null;
-    public Scenes scene;
+    public static int CID;
+    public static Vector3 startPosition;
+    public static GameScenes scene;
     public static GameManager Manager
     {
         get { return manager; }
@@ -21,7 +23,7 @@ public class GameManager : MonoBehaviour {
     void Awake()
     {
         GetThisGameManager();
-        scene = Scenes.MainMenu;
+        scene = GameScenes.MainMenu;
     }
 
     void GetThisGameManager()
@@ -45,23 +47,42 @@ public class GameManager : MonoBehaviour {
     //Main Menu (Scene 0)
     public void OnPlayGame()
     {
-        scene = Scenes.CSS;
+        scene = GameScenes.CSS;
         LoadScene();
     }
 
-    void LoadScene()
+    public void LoadScene()
     {
         switch (scene)
         {
-            case Scenes.MainMenu:
+            case GameScenes.MainMenu:
                 SceneManager.LoadScene(0);
                 break;
-            case Scenes.CSS:
+            case GameScenes.CSS:
                 SceneManager.LoadScene(1);
                 break;
-            case Scenes.HexagonMap:
+            case GameScenes.HexagonMap:
                 SceneManager.LoadScene(2);
                 break;
         }
     }
+
+    #region Caster Select and Initialization
+
+    public void SetCID(int chosenID)
+    {
+        CID = chosenID;
+        Debug.Log("You Locked In: " + CID); //Sets the Caster ID?
+    }
+
+    public void SetStartPosition(Vector3 chosenStartPosition)
+    {
+        startPosition = chosenStartPosition;
+    }
+
+    public void SetTeam()
+    {
+
+    }
+    #endregion
 }
