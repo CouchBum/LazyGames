@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
 
 public class GameManager : MonoBehaviour {
@@ -7,7 +8,7 @@ public class GameManager : MonoBehaviour {
     {
         MainMenu = 0,
         CSS = 1,
-        HexMap = 2
+        HexagonMap = 2
     }
 
     private static GameManager manager = null;
@@ -40,15 +41,26 @@ public class GameManager : MonoBehaviour {
         DontDestroyOnLoad(this.gameObject);
     }
 
+    //Menu Script UI Buttons
+    //Main Menu (Scene 0)
+    public void OnPlayGame()
+    {
+        scene = Scenes.CSS;
+        LoadScene();
+    }
+
     void LoadScene()
     {
         switch (scene)
         {
             case Scenes.MainMenu:
+                SceneManager.LoadScene(0);
                 break;
             case Scenes.CSS:
+                SceneManager.LoadScene(1);
                 break;
-            case Scenes.HexMap:
+            case Scenes.HexagonMap:
+                SceneManager.LoadScene(2);
                 break;
         }
     }
