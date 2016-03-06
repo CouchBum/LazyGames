@@ -13,7 +13,6 @@ GameObject:
   - 23: {fileID: 2336802}
   - 54: {fileID: 5431338}
   - 114: {fileID: 11452652}
-  - 122: {fileID: 12286642}
   m_Layer: 0
   m_Name: Fireball
   m_TagString: Untagged
@@ -92,17 +91,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7eaa544e244e822439f9ea4b4061f766, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!122 &12286642
-Halo:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 196724}
-  m_Enabled: 1
-  m_Color:
-    serializedVersion: 2
-    rgba: 4279214079
-  m_Size: 5
 --- !u!135 &13506556
 SphereCollider:
   m_ObjectHideFlags: 1
@@ -181,6 +169,42 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_Size
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: ShapeModule.enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: UVModule.enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Color.b
+      value: 0.2941177
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Color.g
+      value: 0.7301038
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Range
+      value: 53.08
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Type
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_AreaSize.x
+      value: 11.64
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_AreaSize.y
+      value: 13.35
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

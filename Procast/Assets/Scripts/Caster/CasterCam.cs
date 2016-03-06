@@ -3,8 +3,11 @@ using System.Collections;
 
 public class CasterCam : MonoBehaviour
 {
+    public GameObject casterHead;
     public Texture2D crosshairTex;
     private Rect crhPosition;
+
+    private float zPosition;
     private float csTextH;
     private float csTextW;
     private float sizeAdjuster = .10f;
@@ -17,11 +20,12 @@ public class CasterCam : MonoBehaviour
 
     void Update()
     {
-        CrosshairPosition();
+        //CrosshairPosition();
     }
 
     void LateUpdate()
     {
+        StopClipping();
         CamLogic();
     }
 
@@ -58,19 +62,26 @@ public class CasterCam : MonoBehaviour
         }
     }
 
-    void RayCasting()
+    void StopClipping()
     {
-        Vector3 forward = transform.TransformDirection(Vector3.forward) * 1000f;
-        Debug.DrawRay(transform.position, forward, Color.green);
+        //RayDirction (towards caster Head)
+        Vector3 targetDir = casterHead.transform.position - transform.position;
 
         RaycastHit hit;
-        Ray aimingRay = new Ray(transform.position, forward);
+        Ray aimingRay = new Ray(transform.position, targetDir);
+        Debug.DrawRay(transform.position, targetDir, Color.yellow);
 
         if (Physics.Raycast(aimingRay, out hit))
         {
-            Vector3 hitPoint = hit.point;
-            Debug.Log(hit.collider.tag);
-            Debug.Log(hitPoint);
+            if (hit.collider.tag != "Player")
+            {
+                //this works so you're doing something right
+                //transform.localPosition = new Vector3(1, 1, 1);
+                Debug.Log("Not Hitting the Player");
+            }
+            else
+                Debug.Log("Hitting Player");
+            //--move camera up in transform.position.forward.
         }
     }
 }

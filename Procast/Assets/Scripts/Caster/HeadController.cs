@@ -16,6 +16,6 @@ public class HeadController : MonoBehaviour
     void HeadLook()
     {
         float v = vertLookSpeed * Input.GetAxis("Mouse Y") * Time.deltaTime;
-        transform.Rotate(v, 0, 0);
+        transform.Rotate(Mathf.Clamp(v, -1f, 1f), 0, 0);
     }
 }

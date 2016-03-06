@@ -89,13 +89,11 @@ public class CasterController : MonoBehaviour {
     private Vector3 moveDirection = Vector3.zero;
     #endregion
 
-    void Start()
+    void Awake()
     {
         myCaster = GetComponent<CharacterController>();
         anim = GetComponent<Animator>();
         currentState = CasterState.Idle;
-        health = 100;
-        SetHealthText();        
         targetRotation = transform.rotation;
         fireball = Resources.Load("Fireball") as GameObject;
         firewall = Resources.Load("Firewall") as GameObject;
@@ -105,6 +103,12 @@ public class CasterController : MonoBehaviour {
         firewallReady = true;
         afterburnerReady = true;
         flareboostersReady = true;
+        health = 100;
+    }
+
+    void Start()
+    {
+        //SetHealthText();
     }
 
     void Update()
@@ -135,6 +139,7 @@ public class CasterController : MonoBehaviour {
 
     void SetHealthText()
     {
+
         healthText.text = "Health: " + health.ToString();
     }
 
@@ -222,7 +227,7 @@ public class CasterController : MonoBehaviour {
 
         //turning with mouse
         targetRotation *= Quaternion.AngleAxis(rotSpeed * mouseX * Time.deltaTime, Vector3.up);
-        transform.rotation = targetRotation;
+        myCaster.transform.rotation = targetRotation;
 
         if (myCaster.isGrounded)
         {
