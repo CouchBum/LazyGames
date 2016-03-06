@@ -52,8 +52,7 @@ public class CasterControllerV1 : MonoBehaviour
 
     //Stats
     public int health;
-    protected float moveSpeed = 30f;
-    protected float sprintSpeed = 5.5f;
+    public float moveSpeed;
     protected float rotSpeed = 700.0f;
     protected float detectRange;
     Quaternion targetRotation;
@@ -96,6 +95,7 @@ public class CasterControllerV1 : MonoBehaviour
         targetRotation = transform.rotation;
         moveDirection = Vector3.zero;
         health = 100;
+        moveSpeed = 30f;
         //fireball = Resources.Load("Fireball") as GameObject;
         //firewall = Resources.Load("Firewall") as GameObject;
         /*
@@ -110,7 +110,7 @@ public class CasterControllerV1 : MonoBehaviour
 
     void Update()
     {
-        //RayCasting();
+        RayCasting();
         HealthManager();
         InputHandler();
         StateHandler();
@@ -166,7 +166,7 @@ public class CasterControllerV1 : MonoBehaviour
     void Attack1()
     {
         GameObject myFireball = Instantiate(skill1) as GameObject;
-        myFireball.transform.position = casterCam.transform.position + casterCam.transform.forward * 10f;
+        myFireball.transform.position = casterHead.transform.position + myCaster.transform.forward * 3f;
         Rigidbody rb = myFireball.GetComponent<Rigidbody>();
         rb.velocity = casterCam.transform.forward * 50f;
     }

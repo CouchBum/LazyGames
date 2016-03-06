@@ -7,7 +7,11 @@ public class CasterCam : MonoBehaviour
     public Texture2D crosshairTex;
     private Rect crhPosition;
 
-    private float zPosition;
+    //Camera Smoothing and moving forward/back
+    public Transform camTarget;
+    public float smoothTime = 0.3F;
+    private Vector3 camVel = Vector3.zero;
+
     private float csTextH;
     private float csTextW;
     private float sizeAdjuster = .10f;
@@ -21,17 +25,17 @@ public class CasterCam : MonoBehaviour
     void Update()
     {
         //CrosshairPosition();
+        StopClipping();
     }
 
     void LateUpdate()
     {
-        StopClipping();
         CamLogic();
     }
 
     void OnGUI()
     {
-        GUI.DrawTexture(crhPosition, crosshairTex);
+        //GUI.DrawTexture(crhPosition, crosshairTex);
     }
 
     void CrosshairPosition()
@@ -49,15 +53,15 @@ public class CasterCam : MonoBehaviour
         {
             if (rShoulder == true)
             {
-                Debug.Log("Camera is over your left shoulder");
-                transform.localPosition = new Vector3(-1, 0, -4);
+                Vector3 targetPosition = camTarget.TransformPoint(new Vector3(-1, 0, -4));
+                transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref camVel, smoothTime);
                 rShoulder = false;
             }
             else
             {
                 Debug.Log("Camera is over your right shoulder");
-                transform.localPosition = new Vector3(1, 0, -4);
-                rShoulder = true;
+                Vector3 targetPosition = camTarget.TransformPoint(new Vector3(1, 0, -4));
+                transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref camVel, smoothTime); rShoulder = true;
             }
         }
     }
@@ -65,6 +69,7 @@ public class CasterCam : MonoBehaviour
     void StopClipping()
     {
         //RayDirction (towards caster Head)
+        //Vector3 forward = transform.TransformDirection(Vector3.forward) * 1000f;
         Vector3 targetDir = casterHead.transform.position - transform.position;
 
         RaycastHit hit;
@@ -75,13 +80,18 @@ public class CasterCam : MonoBehaviour
         {
             if (hit.collider.tag != "Player")
             {
-                //this works so you're doing something right
-                //transform.localPosition = new Vector3(1, 1, 1);
+                Vector3 targetPosition = camTarget.TransformPoint(new Vector3(1, 1, 0));
+                transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref camVel, smoothTime);
                 Debug.Log("Not Hitting the Player");
             }
             else
+            {
+                /*
+                Vector3 targetPosition = camTarget.TransformPoint(new Vector3(1, 1, -4));
+                transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref camVel, smoothTime);
                 Debug.Log("Hitting Player");
-            //--move camera up in transform.position.forward.
+                */
+            }
         }
     }
 }

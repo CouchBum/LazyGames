@@ -321,6 +321,14 @@ Transform:
   - {fileID: 1407756607}
   m_Father: {fileID: 653802561}
   m_RootOrder: 0
+--- !u!1 &515282896 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 185250, guid: 9bfddce2cf1242b46bf9426cb3f9cace, type: 2}
+  m_PrefabInternal: {fileID: 1558329453}
+--- !u!4 &515282900 stripped
+Transform:
+  m_PrefabParentObject: {fileID: 471786, guid: 9bfddce2cf1242b46bf9426cb3f9cace, type: 2}
+  m_PrefabInternal: {fileID: 1558329453}
 --- !u!1001 &560053629
 Prefab:
   m_ObjectHideFlags: 0
@@ -1348,6 +1356,18 @@ Prefab:
       propertyPath: m_RootOrder
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 11433712, guid: 9bfddce2cf1242b46bf9426cb3f9cace, type: 2}
+      propertyPath: casterHead
+      value: 
+      objectReference: {fileID: 515282896}
+    - target: {fileID: 11433712, guid: 9bfddce2cf1242b46bf9426cb3f9cace, type: 2}
+      propertyPath: crosshairTex
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 11433712, guid: 9bfddce2cf1242b46bf9426cb3f9cace, type: 2}
+      propertyPath: camTarget
+      value: 
+      objectReference: {fileID: 515282900}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 9bfddce2cf1242b46bf9426cb3f9cace, type: 2}
   m_IsPrefabParent: 0
