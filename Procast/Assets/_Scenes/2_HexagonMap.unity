@@ -25,7 +25,7 @@ RenderSettings:
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
   m_AmbientMode: 0
-  m_SkyboxMaterial: {fileID: 2100000, guid: fb3b9b55c01d2194c816b2d469854e16, type: 2}
+  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -36,7 +36,7 @@ RenderSettings:
   m_ReflectionBounces: 1
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
-  m_Sun: {fileID: 0}
+  m_Sun: {fileID: 1782884981}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -1580,7 +1580,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1782884980}
-  m_LocalRotation: {x: 0.6366841, y: 0, z: 0, w: 0.7711248}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071067}
   m_LocalPosition: {x: 0, y: 100, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -1692,52 +1692,6 @@ Transform:
   - {fileID: 2058675782}
   m_Father: {fileID: 653802561}
   m_RootOrder: 1
---- !u!1001 &1899421415
-Prefab:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 407912, guid: 9bfddce2cf1242b46bf9426cb3f9cace, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 407912, guid: 9bfddce2cf1242b46bf9426cb3f9cace, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 25
-      objectReference: {fileID: 0}
-    - target: {fileID: 407912, guid: 9bfddce2cf1242b46bf9426cb3f9cace, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 100.1
-      objectReference: {fileID: 0}
-    - target: {fileID: 407912, guid: 9bfddce2cf1242b46bf9426cb3f9cace, type: 2}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 407912, guid: 9bfddce2cf1242b46bf9426cb3f9cace, type: 2}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 407912, guid: 9bfddce2cf1242b46bf9426cb3f9cace, type: 2}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 407912, guid: 9bfddce2cf1242b46bf9426cb3f9cace, type: 2}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 407912, guid: 9bfddce2cf1242b46bf9426cb3f9cace, type: 2}
-      propertyPath: m_RootOrder
-      value: 7
-      objectReference: {fileID: 0}
-    - target: {fileID: 11433712, guid: 9bfddce2cf1242b46bf9426cb3f9cace, type: 2}
-      propertyPath: crosshairTex
-      value: 
-      objectReference: {fileID: 2800000, guid: 2bacfb8f4c3433147916d5f2c3b9e1a0, type: 3}
-    m_RemovedComponents: []
-  m_ParentPrefab: {fileID: 100100000, guid: 9bfddce2cf1242b46bf9426cb3f9cace, type: 2}
-  m_IsPrefabParent: 0
 --- !u!1 &1906988907
 GameObject:
   m_ObjectHideFlags: 0
