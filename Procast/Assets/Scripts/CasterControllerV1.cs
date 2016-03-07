@@ -90,14 +90,13 @@ public class CasterControllerV1 : MonoBehaviour
 
     void Awake()
     {
+        Cursor.visible = false;
         myCaster = GetComponent<CharacterController>();
         currentState = CasterState.Idle;
         targetRotation = transform.rotation;
         moveDirection = Vector3.zero;
         health = 100;
-        moveSpeed = 30f;
-        //fireball = Resources.Load("Fireball") as GameObject;
-        //firewall = Resources.Load("Firewall") as GameObject;
+        moveSpeed = 10f;
         /*
         crouchToggle = false;
         sprintToggle = false;
@@ -114,9 +113,17 @@ public class CasterControllerV1 : MonoBehaviour
         HealthManager();
         InputHandler();
         StateHandler();
+        ToggleCursor();
+    }
+    
+    void ToggleCursor()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Cursor.visible = !Cursor.visible;
+        }
     }
 
-    
     void HealthManager()
     {
         if (health <= 0)
@@ -139,6 +146,29 @@ public class CasterControllerV1 : MonoBehaviour
     }
     */
 
+    void TakeDamage(int damageTaken, Vector3 damageDirection)
+    {
+        //if hit by an attack, send this to health/screen display
+    }
+
+    //returns the point the caster is aiming at
+    private RaycastHit GetRaycastHit()
+    {
+        Vector3 forward = casterCam.transform.TransformDirection(Vector3.forward) * 1000f;
+        //Debug.DrawRay(casterHead.transform.position, forward, Color.blue);
+
+        //RayCast from Camera
+        RaycastHit hit;
+        Ray aimingRay = new Ray(casterCam.transform.position, forward);
+
+        if (Physics.Raycast(aimingRay, out hit))
+        {
+            return hit;
+        }
+        else
+            return hit;
+    }   
+     
     void RayCasting()
     {
         Vector3 forward = casterCam.transform.TransformDirection(Vector3.forward) * 1000f;
@@ -146,15 +176,13 @@ public class CasterControllerV1 : MonoBehaviour
 
         //RayCast from Camera
         RaycastHit hit;
-        Vector3 hitPoint;
         Ray aimingRay = new Ray(casterCam.transform.position, forward);
 
         if (Physics.Raycast(aimingRay, out hit))
         {
-            hitPoint = hit.point;
             Debug.Log(hit.collider.tag);
-            Debug.DrawLine(casterCam.transform.position, hitPoint, Color.green);
-            Debug.DrawLine(casterHead.transform.position, hitPoint, Color.red);
+            Debug.DrawLine(casterCam.transform.position, hit.point, Color.green);
+            Debug.DrawLine(casterHead.transform.position, hit.point, Color.red);
         }
         else
         {
@@ -166,9 +194,10 @@ public class CasterControllerV1 : MonoBehaviour
     void Attack1()
     {
         GameObject myFireball = Instantiate(skill1) as GameObject;
-        myFireball.transform.position = casterHead.transform.position + myCaster.transform.forward * 3f;
+        myFireball.transform.position = casterHead.transform.position + casterHead.transform.forward * 3f;
+        myFireball.transform.LookAt(GetRaycastHit().point);
         Rigidbody rb = myFireball.GetComponent<Rigidbody>();
-        rb.velocity = casterCam.transform.forward * 50f;
+        rb.velocity = casterHead.transform.forward * 50f;
     }
 
     void Attack2()
@@ -215,13 +244,23 @@ public class CasterControllerV1 : MonoBehaviour
                 if (v == 0 && h == 0)
                 {
                     currentState = CasterState.Idle;
-                    sprintToggle = false;
                     moveDirection = Vector3.zero;
                 }
 
-                //To Walk or Sprint
+                //To Move
                 if (Mathf.Abs(h) > 0 || Mathf.Abs(v) > 0)
                 {
+                    if (Mathf.Abs(h) >= .75 && Mathf.Abs(v) >= .75)
+                    {
+                        if(h >= .75)
+                            h = .75f;
+                        if (h <= -.75)
+                            h = -.75f;
+                        if (v >= .75)
+                            v = .75f;
+                        if (v <= -.75)
+                            v = -.75f;
+                    }
                     moveDirection = new Vector3(h, 0, v);
                     moveDirection = transform.TransformDirection(moveDirection);
                     moveDirection *= moveSpeed;

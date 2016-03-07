@@ -8,44 +8,48 @@ public class CasterCam : MonoBehaviour
     private Rect crhPosition;
 
     //Camera Smoothing and moving forward/back
-    public Transform camTarget;
+    //public Transform camTarget;
+    private Vector3 offset;
+    private Vector3 zoomOffset = new Vector3(10, 1, -1);
     public float smoothTime = 0.3F;
     private Vector3 camVel = Vector3.zero;
 
     private float csTextH;
     private float csTextW;
-    private float sizeAdjuster = .10f;
     bool rShoulder;
 
     void Start()
     {
+        offset = transform.position - casterHead.transform.position;
         rShoulder = true;
     }
 
     void Update()
     {
         //CrosshairPosition();
-        StopClipping();
+        //StopWallClipping();
     }
 
     void LateUpdate()
     {
-        CamLogic();
+        //transform.position = casterHead.transform.position + offset;
+        //CamLogic();
     }
 
     void OnGUI()
     {
-        //GUI.DrawTexture(crhPosition, crosshairTex);
+        GUI.DrawTexture(crhPosition, crosshairTex);
     }
 
     void CrosshairPosition()
     {
-        csTextH = crosshairTex.height * sizeAdjuster;
-        csTextW = crosshairTex.width * sizeAdjuster;
+        csTextH = crosshairTex.height;
+        csTextW = crosshairTex.width;
         crhPosition = new Rect((Screen.width - csTextW) / 2,
            (Screen.height - csTextH) / 2, csTextW, csTextH); //determines width/height of our crosshair GUI texture
     }
 
+    /*
     void CamLogic()
     {
         //Toggles cam location between left and right over the shoulder.
@@ -65,8 +69,9 @@ public class CasterCam : MonoBehaviour
             }
         }
     }
+    */
 
-    void StopClipping()
+    void StopWallClipping()
     {
         //RayDirction (towards caster Head)
         //Vector3 forward = transform.TransformDirection(Vector3.forward) * 1000f;
@@ -80,12 +85,12 @@ public class CasterCam : MonoBehaviour
         {
             if (hit.collider.tag != "Player")
             {
-                Vector3 targetPosition = camTarget.TransformPoint(new Vector3(1, 1, 0));
-                transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref camVel, smoothTime);
+                transform.position = Vector3.SmoothDamp(transform.position, zoomOffset, ref camVel, smoothTime);
                 Debug.Log("Not Hitting the Player");
             }
             else
             {
+                transform.position = Vector3.SmoothDamp(transform.position, offset, ref camVel, smoothTime);
                 /*
                 Vector3 targetPosition = camTarget.TransformPoint(new Vector3(1, 1, -4));
                 transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref camVel, smoothTime);
@@ -95,5 +100,7 @@ public class CasterCam : MonoBehaviour
         }
     }
 }
+
+//Vector3 targetPosition = camTarget.TransformPoint(new Vector3(1, 1, 0));
 
 

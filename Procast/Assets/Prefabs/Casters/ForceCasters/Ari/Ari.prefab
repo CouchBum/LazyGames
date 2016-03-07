@@ -573,8 +573,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   casterHead: {fileID: 185250}
-  crosshairTex: {fileID: 0}
-  camTarget: {fileID: 471786}
+  crosshairTex: {fileID: 2800000, guid: 2bacfb8f4c3433147916d5f2c3b9e1a0, type: 3}
   smoothTime: 0.3
 --- !u!114 &11479274
 MonoBehaviour:
@@ -606,7 +605,7 @@ MonoBehaviour:
   skill2: {fileID: 116698, guid: fe87ed4511cf30e4ba21737b773d8b4f, type: 2}
   healthText: {fileID: 0}
   health: 0
-  moveSpeed: 30
+  moveSpeed: 5
   crouchToggle: 0
   sprintToggle: 0
   gravity: 20
