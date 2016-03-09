@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
+using UnityEngine.Networking;
 
-public class CasterControllerV1 : MonoBehaviour
+public class CasterControllerV1 : NetworkBehaviour
 {
 
     protected enum CasterState
@@ -24,6 +24,10 @@ public class CasterControllerV1 : MonoBehaviour
     public GameObject deadCaster;
     public Camera casterCam;
     public GameObject casterHead;
+    [SerializeField]
+    GameObject playerUIPrefab;
+    private GameObject playerUIinstance;
+
 
     //skills = should move to own script
     public GameObject skill1;
@@ -51,7 +55,10 @@ public class CasterControllerV1 : MonoBehaviour
     public Text healthText;
 
     //Stats
+    private int maxHealth = 100;
+    [SyncVar]
     public int health;
+
     public float moveSpeed;
     protected float rotSpeed = 700.0f;
     protected float detectRange;
@@ -90,12 +97,12 @@ public class CasterControllerV1 : MonoBehaviour
 
     void Awake()
     {
-        Cursor.visible = false;
         myCaster = GetComponent<CharacterController>();
         currentState = CasterState.Idle;
         targetRotation = transform.rotation;
         moveDirection = Vector3.zero;
-        health = 100;
+        playerUIinstance = Instantiate(playerUIPrefab);
+        health = maxHealth;
         moveSpeed = 10f;
         /*
         crouchToggle = false;
@@ -109,21 +116,15 @@ public class CasterControllerV1 : MonoBehaviour
 
     void Update()
     {
-        RayCasting();
-        HealthManager();
-        InputHandler();
-        StateHandler();
-        ToggleCursor();
-    }
-    
-    void ToggleCursor()
-    {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if(isLocalPlayer)
         {
-            Cursor.visible = !Cursor.visible;
+            //RayCasting();
+            HealthManager();
+            InputHandler();
+            StateHandler();
         }
     }
-
+    
     void HealthManager()
     {
         if (health <= 0)
@@ -150,12 +151,11 @@ public class CasterControllerV1 : MonoBehaviour
     {
         //if hit by an attack, send this to health/screen display
     }
-
-    //returns the point the caster is aiming at
-    private RaycastHit GetRaycastHit()
+ 
+    private RaycastHit RayCasting()
     {
         Vector3 forward = casterCam.transform.TransformDirection(Vector3.forward) * 1000f;
-        //Debug.DrawRay(casterHead.transform.position, forward, Color.blue);
+        Debug.DrawRay(casterCam.transform.position, forward, Color.blue);
 
         //RayCast from Camera
         RaycastHit hit;
@@ -163,41 +163,27 @@ public class CasterControllerV1 : MonoBehaviour
 
         if (Physics.Raycast(aimingRay, out hit))
         {
+            Debug.Log("You Hit " + hit.collider.tag);
+            //Debug.DrawLine(casterCam.transform.position, hit.point, Color.green);
+            //Debug.DrawLine(casterHead.transform.position, hit.point, Color.red);
             return hit;
-        }
-        else
-            return hit;
-    }   
-     
-    void RayCasting()
-    {
-        Vector3 forward = casterCam.transform.TransformDirection(Vector3.forward) * 1000f;
-        //Debug.DrawRay(casterHead.transform.position, forward, Color.blue);
-
-        //RayCast from Camera
-        RaycastHit hit;
-        Ray aimingRay = new Ray(casterCam.transform.position, forward);
-
-        if (Physics.Raycast(aimingRay, out hit))
-        {
-            Debug.Log(hit.collider.tag);
-            Debug.DrawLine(casterCam.transform.position, hit.point, Color.green);
-            Debug.DrawLine(casterHead.transform.position, hit.point, Color.red);
         }
         else
         {
             //hitPoint = forward;
+            return hit;
         }
     }
 
     #region Skills
-    void Attack1()
+    [Command]
+    void CmdAttack1()
     {
-        GameObject myFireball = Instantiate(skill1) as GameObject;
-        myFireball.transform.position = casterHead.transform.position + casterHead.transform.forward * 3f;
-        myFireball.transform.LookAt(GetRaycastHit().point);
+        Vector3 attack1Position = casterHead.transform.position + casterHead.transform.forward * 3f;
+        Quaternion attackRotation = casterCam.transform.rotation;
+        GameObject myFireball = Instantiate(skill1, attack1Position, attackRotation) as GameObject;
         Rigidbody rb = myFireball.GetComponent<Rigidbody>();
-        rb.velocity = casterHead.transform.forward * 50f;
+        rb.velocity = myFireball.transform.forward * 50f;
     }
 
     void Attack2()
@@ -278,7 +264,7 @@ public class CasterControllerV1 : MonoBehaviour
             //FireballSkill (Mouse1)
             if (Input.GetButtonDown("Attack1"))
             {
-                Attack1();
+                CmdAttack1();
                 //Invoke("Attack1", .5f);
             }
 
@@ -317,6 +303,7 @@ public class CasterControllerV1 : MonoBehaviour
         // Instantiate the wreck game object at the same position we are at
         GameObject wreckClone = (GameObject)Instantiate(deadCaster, transform.position, transform.rotation);
         // Kill ourselves
+        Destroy(playerUIinstance);
         Destroy(thisCaster);
     }
 

@@ -1,29 +1,30 @@
 ﻿using UnityEngine;
-using System.Collections;
+using UnityEngine.Networking;
 
-public class CasterCam : MonoBehaviour
+public class CasterCam : NetworkBehaviour
 {
     public GameObject casterHead;
-    public Texture2D crosshairTex;
-    private Rect crhPosition;
+    //public Texture2D crosshairTex;
+    //private Rect crhPosition;
 
     //Camera Smoothing and moving forward/back
     //public Transform camTarget;
     private Vector3 offset;
-    private Vector3 zoomOffset = new Vector3(10, 1, -1);
-    public float smoothTime = 0.3F;
-    private Vector3 camVel = Vector3.zero;
+    //private Vector3 zoomOffset = new Vector3(10, 1, -1);
+    //public float smoothTime = 0.3F;
+    //private Vector3 camVel = Vector3.zero;
 
-    private float csTextH;
-    private float csTextW;
-    bool rShoulder;
+    //private float csTextH;
+    //private float csTextW;
+    //bool rShoulder;
 
     void Start()
     {
         offset = transform.position - casterHead.transform.position;
-        rShoulder = true;
+        //rShoulder = true;
     }
 
+    /*
     void Update()
     {
         //CrosshairPosition();
@@ -49,7 +50,7 @@ public class CasterCam : MonoBehaviour
            (Screen.height - csTextH) / 2, csTextW, csTextH); //determines width/height of our crosshair GUI texture
     }
 
-    /*
+    
     void CamLogic()
     {
         //Toggles cam location between left and right over the shoulder.
@@ -69,7 +70,7 @@ public class CasterCam : MonoBehaviour
             }
         }
     }
-    */
+    
 
     void StopWallClipping()
     {
@@ -95,10 +96,10 @@ public class CasterCam : MonoBehaviour
                 Vector3 targetPosition = camTarget.TransformPoint(new Vector3(1, 1, -4));
                 transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref camVel, smoothTime);
                 Debug.Log("Hitting Player");
-                */
             }
         }
     }
+*/
 }
 
 //Vector3 targetPosition = camTarget.TransformPoint(new Vector3(1, 1, 0));
