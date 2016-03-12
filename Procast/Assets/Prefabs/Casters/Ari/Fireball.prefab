@@ -12,7 +12,9 @@ GameObject:
   - 135: {fileID: 13506556}
   - 23: {fileID: 2336802}
   - 54: {fileID: 5431338}
-  - 114: {fileID: 11452652}
+  - 114: {fileID: 11480240}
+  - 114: {fileID: 11426494}
+  - 114: {fileID: 11416792}
   m_Layer: 0
   m_Name: Fireball
   m_TagString: Untagged
@@ -80,7 +82,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 1
---- !u!114 &11452652
+--- !u!114 &11416792
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -88,9 +90,61 @@ MonoBehaviour:
   m_GameObject: {fileID: 196724}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7eaa544e244e822439f9ea4b4061f766, type: 3}
+  m_Script: {fileID: 11500000, guid: 5b102eb5ba62f1447baf18587454b480, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &11426494
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 196724}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1768714887, guid: 870353891bb340e2b2a9c8707e7419ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_TransformSyncMode: 3
+  m_SendInterval: 0
+  m_SyncRotationAxis: 7
+  m_RotationSyncCompression: 0
+  m_SyncSpin: 0
+  m_MovementTheshold: 0.001
+  m_SnapThreshold: 5
+  m_InterpolateRotation: 1
+  m_InterpolateMovement: 1
+--- !u!114 &11480240
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 196724}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 372142912, guid: 870353891bb340e2b2a9c8707e7419ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SceneId:
+    m_Value: 0
+  m_AssetId:
+    i0: 74
+    i1: 142
+    i2: 155
+    i3: 49
+    i4: 99
+    i5: 221
+    i6: 73
+    i7: 164
+    i8: 74
+    i9: 69
+    i10: 155
+    i11: 241
+    i12: 101
+    i13: 151
+    i14: 124
+    i15: 220
+  m_ServerOnly: 0
+  m_LocalPlayerAuthority: 0
 --- !u!135 &13506556
 SphereCollider:
   m_ObjectHideFlags: 1
@@ -205,6 +259,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_AreaSize.y
       value: 13.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_SendInterval
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

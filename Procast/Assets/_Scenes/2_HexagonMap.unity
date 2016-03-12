@@ -616,7 +616,7 @@ MonoBehaviour:
   m_OfflineScene: 
   m_OnlineScene: 
   m_SpawnPrefabs:
-  - {fileID: 0}
+  - {fileID: 196724, guid: 4a8e9b3163dd49a44a459bf165977cdc, type: 2}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}

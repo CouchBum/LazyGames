@@ -30,8 +30,8 @@ public class CasterControllerV1 : NetworkBehaviour
 
 
     //skills = should move to own script
-    public GameObject skill1;
-    public GameObject skill2;
+    public GameObject skill1Prefab;
+    public GameObject skill2Prefab;
 
     bool fireballReady;
     bool firewallReady;
@@ -57,7 +57,7 @@ public class CasterControllerV1 : NetworkBehaviour
     //Stats
     private int maxHealth = 100;
     [SyncVar]
-    public int health;
+    public int currentHealth;
 
     public float moveSpeed;
     protected float rotSpeed = 700.0f;
@@ -102,7 +102,7 @@ public class CasterControllerV1 : NetworkBehaviour
         targetRotation = transform.rotation;
         moveDirection = Vector3.zero;
         playerUIinstance = Instantiate(playerUIPrefab);
-        health = maxHealth;
+        currentHealth = maxHealth;
         moveSpeed = 10f;
         /*
         crouchToggle = false;
@@ -119,26 +119,12 @@ public class CasterControllerV1 : NetworkBehaviour
         if(isLocalPlayer)
         {
             //RayCasting();
-            HealthManager();
+            //HealthManager();
             InputHandler();
-            StateHandler();
+            CmdStateHandler();
         }
     }
-    
-    void HealthManager()
-    {
-        if (health <= 0)
-        {
-            currentState = CasterState.Dead;
-        }
         
-        if (Input.GetKeyDown(KeyCode.K)) //hit by attack
-        {
-            health -= 50; //attack damage
-            //SetHealthText();
-        }
-    }
-    
     /*
     void SetHealthText()
     {
@@ -147,9 +133,19 @@ public class CasterControllerV1 : NetworkBehaviour
     }
     */
 
-    void TakeDamage(int damageTaken, Vector3 damageDirection)
+    public void TakeDamage(int damageTaken, Vector3 damageDirection)
     {
         //if hit by an attack, send this to health/screen display
+        if (!isServer)
+            return;
+
+        currentHealth -= damageTaken;
+        Debug.Log("You took damage");
+
+        if (currentHealth <= 0)
+        {
+            currentState = CasterState.Dead;
+        }
     }
  
     private RaycastHit RayCasting()
@@ -181,14 +177,15 @@ public class CasterControllerV1 : NetworkBehaviour
     {
         Vector3 attack1Position = casterHead.transform.position + casterHead.transform.forward * 3f;
         Quaternion attackRotation = casterCam.transform.rotation;
-        GameObject myFireball = Instantiate(skill1, attack1Position, attackRotation) as GameObject;
+        GameObject myFireball = Instantiate(skill1Prefab, attack1Position, attackRotation) as GameObject;
         Rigidbody rb = myFireball.GetComponent<Rigidbody>();
         rb.velocity = myFireball.transform.forward * 50f;
+        NetworkServer.Spawn(myFireball);
     }
 
     void Attack2()
     {
-        GameObject myFirewall = Instantiate(skill2) as GameObject;
+        GameObject myFirewall = Instantiate(skill2Prefab) as GameObject;
         myFirewall.transform.position = myCaster.transform.position + casterCam.transform.forward * 10f;
         myFirewall.transform.rotation = myCaster.transform.rotation;
         Rigidbody rb = myFirewall.GetComponent<Rigidbody>();
@@ -289,17 +286,20 @@ public class CasterControllerV1 : NetworkBehaviour
         }
     }
 
-    void StateHandler()
+    [Command]
+    void CmdStateHandler()
     {
         if (currentState == CasterState.Dead)
         {
             KillSelf();
-            //Invoke("Respawn", 6f);
         }
     }
 
     void KillSelf()
     {
+        if (!isServer)
+            return;
+        
         // Instantiate the wreck game object at the same position we are at
         GameObject wreckClone = (GameObject)Instantiate(deadCaster, transform.position, transform.rotation);
         // Kill ourselves
